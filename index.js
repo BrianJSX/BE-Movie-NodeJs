@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
 const moviesRouter = require("./routes/movies");
+const listsRouter = require("./routes/lists");
+
 
 require("dotenv").config();
 
@@ -27,6 +29,7 @@ app.use(bodyParser.json());
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/movies", moviesRouter);
+app.use("/api/lists", listsRouter);
 
 let port = process.env.PORT || 8080;
 
