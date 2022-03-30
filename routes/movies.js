@@ -52,7 +52,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 });
 
 //GET
-router.get("/find/:id", verifyToken, async (req, res) => {
+router.get("/find/:id", async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
     res.status(200).json(movie);
@@ -61,8 +61,83 @@ router.get("/find/:id", verifyToken, async (req, res) => {
   }
 });
 
+//search
+router.get("/search/", async (req, res) => {
+  try {
+    const { title } = req.query;
+    const rgx = (pattern) => new RegExp(`.*${pattern}.*`);
+    const searchRgx = rgx(title);
+    console.log(searchRgx);
+    const movie = await Movie.find({ title: { $regex: searchRgx, $options: "i" }, isSeries: false }).limit(6);
+    res.status(200).json(movie);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//GET Best Movie
+router.get("/bestMovie", async (req, res) => {
+  try {
+    const movie = await Movie.aggregate([
+      {
+        $match: { isSeries: false },
+      },
+      {
+        $sample: { size: 10 },
+      },
+    ]);
+    res.status(200).json(movie);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//new
+router.get("/newMovie", async (req, res) => {
+  try {
+    const movie = await Movie.aggregate([
+      {
+        $match: { isSeries: false },
+      },
+      { $sort: { updatedAt: -1 }},
+      {
+        $limit: 10
+      },
+    ]);
+    res.status(200).json(movie);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/allMovies", async (req, res) => {
+  try {
+    const movie = await Movie.find();
+    res.status(200).json(movie);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//Get movie series
+router.get("/movieList", async (req, res) => {
+  try {
+    const movie = await Movie.aggregate([
+      {
+        $match: { isSeries: true },
+      },
+      {
+        $sample: { size: 10 },
+      },
+    ]);
+    res.status(200).json(movie);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 //GET Random
-router.get("/random/", verifyToken, async (req, res) => {
+router.get("/random/", async (req, res) => {
   try {
     const type = req.query.type;
     if (type === "series") {
@@ -87,7 +162,7 @@ router.get("/random/", verifyToken, async (req, res) => {
       res.status(200).json(movie);
     }
   } catch (err) {
-      console.log(err);
+    console.log(err);
     res.status(500).json(err);
   }
 });

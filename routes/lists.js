@@ -2,6 +2,19 @@ const router = require("express").Router();
 const List = require("../models/List");
 const verifyToken = require("../verifyToken");
 
+//New
+router.get("/newList", async (req, res) => {
+  try {
+    let list = await List.aggregate([
+      { $sort: { updatedAt: -1 }},
+      { $limit: 8 }
+    ]);
+    return res.status(200).json(list);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 //Create
 router.post("/", verifyToken, async (req, res) => {
   if (req.user.isAdmin) {
@@ -14,6 +27,36 @@ router.post("/", verifyToken, async (req, res) => {
     }
   } else {
     res.status(403).json("you are not allows");
+  }
+});
+
+//Update
+router.put("/:id", verifyToken, async (req, res) => {
+  if (req.user.isAdmin) {
+    try {
+      const updateList = await List.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+        },
+        { new: true }
+      );
+      res.status(200).json(updateList);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  } else {
+    res.status(403).json("you are not allows");
+  }
+});
+
+//get by id
+router.get("/:id", async (req, res) => {
+  try {
+    const lists = await List.findById(req.params.id);
+    res.status(200).json(lists);
+  } catch (err) {
+    res.status(500).json(err);
   }
 });
 

@@ -17,9 +17,11 @@ router.post("/register", async (req, res) => {
       ).toString(),
     });
     const user = await newUser.save();
-    res.status(201).json(user);
+    console.log(user._doc);
+    const {password, ...info} = user._doc;
+    res.status(201).json({...info});
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json("email hoặc user đã tồn tại");;
   }
 });
 

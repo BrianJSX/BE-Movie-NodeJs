@@ -42,6 +42,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
     res.status(403).json("you can delete your account !");
   }
 });
+
 //Get
 router.get("/find/:id", async (req, res) => {
   try {
@@ -52,9 +53,9 @@ router.get("/find/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
 //Get All
 router.get("/", verifyToken, async (req, res) => {
-  console.log(req.user.isAdmin);
   if (req.user.isAdmin) {
     try {
       const query = req.query.new;

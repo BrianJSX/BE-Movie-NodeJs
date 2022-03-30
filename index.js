@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const cors = require('cors')
 
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
@@ -11,6 +12,8 @@ const listsRouter = require("./routes/lists");
 require("dotenv").config();
 
 const app = express();
+
+
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -22,14 +25,19 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
+
+//cor
+app.use(cors());
+
+//body
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //routes
-app.use("/api/auth", authRouter);
-app.use("/api/users", usersRouter);
-app.use("/api/movies", moviesRouter);
-app.use("/api/lists", listsRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/movies", moviesRouter);
+app.use("/api/v1/lists", listsRouter);
 
 let port = process.env.PORT || 8080;
 
