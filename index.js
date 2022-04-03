@@ -1,18 +1,16 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const cors = require('cors')
-
+const cors = require("cors");
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
 const moviesRouter = require("./routes/movies");
 const listsRouter = require("./routes/lists");
-
-
-require("dotenv").config();
+const socketEvent = require("./modules/SocketEvent");
 
 const app = express();
-
 
 mongoose
   .connect(process.env.MONGO_URL, {
@@ -41,6 +39,15 @@ app.use("/api/v1/lists", listsRouter);
 
 let port = process.env.PORT || 8080;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running port ${port}`);
 });
+
+//socket.io
+const io = require("socket.io")(server, {
+  cors: {
+    origin: process.env.URL_CORS,
+  },
+});
+
+socketEvent(io);

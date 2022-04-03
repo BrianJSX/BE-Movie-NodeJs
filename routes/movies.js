@@ -17,7 +17,7 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-//Update
+// Update
 router.put("/:id", verifyToken, async (req, res) => {
   if (req.user.isAdmin) {
     try {
@@ -35,6 +35,22 @@ router.put("/:id", verifyToken, async (req, res) => {
   } else {
     res.status(403).json("you are not allows");
   }
+});
+
+router.put("/comments/:id", async (req, res) => {
+  let response = {
+    userId: req.body.userId,
+    message: req.body.message,
+  };
+  const updateMovie = await Movie.findByIdAndUpdate(
+    req.params.id,
+    {
+      $push: { comments: { userId: req.body.userId, message: req.body.message } },
+    },
+    { new: true }
+  );
+
+  res.status(200).json(response);
 });
 
 //Delete
@@ -68,7 +84,10 @@ router.get("/search/", async (req, res) => {
     const rgx = (pattern) => new RegExp(`.*${pattern}.*`);
     const searchRgx = rgx(title);
     console.log(searchRgx);
-    const movie = await Movie.find({ title: { $regex: searchRgx, $options: "i" }, isSeries: false }).limit(6);
+    const movie = await Movie.find({
+      title: { $regex: searchRgx, $options: "i" },
+      isSeries: false,
+    }).limit(6);
     res.status(200).json(movie);
   } catch (err) {
     res.status(500).json(err);
@@ -99,9 +118,9 @@ router.get("/newMovie", async (req, res) => {
       {
         $match: { isSeries: false },
       },
-      { $sort: { updatedAt: -1 }},
+      { $sort: { updatedAt: -1 } },
       {
-        $limit: 10
+        $limit: 10,
       },
     ]);
     res.status(200).json(movie);

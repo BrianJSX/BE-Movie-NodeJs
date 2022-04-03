@@ -12,6 +12,18 @@ const MovieSchema = new mongoose.Schema(
     genre: { type: String },
     isSeries: { type: Boolean, default: false },
     time: { type: String },
+    comments: [
+      {
+        type: new mongoose.Schema(
+          {
+            userId: String,
+            message: String,
+          },
+          { timestamps: true }
+        ),
+      },
+    ],
+    // comments: [{ userId: String, message: String, timestamps: true }],
   },
   { timestamps: true }
 );
